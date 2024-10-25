@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <h2>Welcome {{ user.EName }}</h2>
+    <ul>
+      <li>Profile: {{ user.Profile }}</li>
+      <li>EEMail: {{ user.EEMail }}</li>
+      <li>EMPID: {{ user.EMPID }}</li>
+      <li>Line Manager: {{ user.LineManager }}</li>
+      <li>Line Manager ID: {{ user.LineManagerID }}</li>
+      <li>Team: {{ user.Team }}</li>
+    </ul>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </body>
+</html>

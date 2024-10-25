@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>View Timesheet Entries for {{ date }}</title>
+  </head>
+  <body>
+    <h2>Timesheet Entries for {{ date }}</h2>
+
+    <!-- Back Button to go back to summary -->
+    <a href="{{ url_for('timesheet_summary') }}">Back to Summary</a>
+
+    <!-- Timesheet Entries -->
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Project Code</th>
+          <th>Category</th>
+          <th>Billable Time</th>
+          <th>Non-Billable Admin Time</th>
+          <th>Non-Billable Training Time</th>
+          <th>Total Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>{{ entry.ProjectCode }}</td>
+          <td>{{ entry.Category1 }}</td>
+          <td>{{ entry.billable_time }}</td>
+          <td>{{ entry.nonbillable_admin_time }}</td>
+          <td>{{ entry.nonbillable_training_time }}</td>
+          <td>{{ entry.total_time }}</td>
+          <td>
+            <a
+              href="{{ url_for('edit_timesheet_entry', entry_id=entry.Uniq_ID) }}"
+              >Edit</a
+            >
+            <a
+              href="{{ url_for('delete_timesheet_entry', entry_id=entry.Uniq_ID) }}"
+              onclick="return confirm('Are you sure?')"
+              >Delete</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

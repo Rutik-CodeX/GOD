@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fill Timesheet</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      function updateCategories() {
+        const allocationType = document.getElementById("allocationType").value;
+        const category1 = document.getElementById("category1");
+        category1.innerHTML = "";
+
+        // Load Category 1 options based on Allocation Type
+        if (allocationType === "billable") {
+          category1.options.add(new Option("Cat B1", "Cat B1"));
+          category1.options.add(new Option("Cat B2", "Cat B2"));
+        } else if (allocationType === "non-billable") {
+          category1.options.add(new Option("Admin", "Admin"));
+          category1.options.add(new Option("Training", "Training"));
+        }
+      }
+
+      function validateForm() {
+        // Basic client-side validation (for demonstration)
+        const hours = document.forms["timesheetForm"]["hours"].value;
+        const minutes = document.forms["timesheetForm"]["minutes"].value;
+
+        if (isNaN(hours) || isNaN(minutes)) {
+          alert("Please enter valid numbers for hours and minutes.");
+          return false;
+        }
+        return true;
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Fill Timesheet</h2>
+    <form
+      name="timesheetForm"
+      method="POST"
+      action="{{ url_for('submit_timesheet') }}"
+      onsubmit="return validateForm()"
+    >
+      <label>EName: </label>
+      <input type="text" name="EName" value="{{ user.EName }}" readonly /><br />
+
+      <label>LineManager Name: </label>
+      <input
+        type="text"
+        name="LineManager"
+        value="{{ user.LineManager }}"
+        readonly
+      /><br />
+
+      <label>EmpID: </label>
+      <input type="text" name="EmpID" value="{{ user.EMPID }}" readonly /><br />
+
+      <label>Team: </label>
+      <input type="text" name="Team" value="{{ user.Team }}" readonly /><br />
+
+      <label>Project Code: </label>
+      <select name="ProjectCode">
+        <option value="P001">P001</option>
+        <option value="P002">P002</option></select
+      ><br />
+
+      <label>Comments: </label>
+      <textarea name="comments"></textarea><br />
+
+      <label>Date of Entry: </label>
+      <input type="text" id="dateofentry" name="DateofEntry" multiple /><br />
+
+      <label>Hours: </label>
+      <select name="hours">
+        {% for hour in range(9) %}
+        <option value="{{ hour }}">{{ hour }}</option>
+        {% endfor %}
+      </select>
+
+      <label>Minutes: </label>
+      <select name="minutes">
+        {% for minute in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] %}
+        <option value="{{ minute }}">{{ minute }}</option>
+        {% endfor %}</select
+      ><br />
+
+      <label>Allocation Type: </label>
+      <select
+        id="allocationType"
+        name="AllocationType"
+        onchange="updateCategories()"
+      >
+        <option value="billable">Billable</option>
+        <option value="non-billable">Non-Billable</option></select
+      ><br />
+
+      <label>Category 1: </label>
+      <select id="category1" name="Category1"></select
+      ><br />
+
+      <label>Category 2: </label>
+      <input type="text" name="Category2" /><br />
+
+      <label>Category 3: </label>
+      <input type="text" name="Category3" /><br />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <script>
+      flatpickr("#dateofentry", {
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+      });
+    </script>
+  </body>
+</html>

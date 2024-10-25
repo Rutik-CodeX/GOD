@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weekly Timesheet Summary</title>
+  </head>
+  <body>
+    <h2>
+      Weekly Timesheet Summary ({{ monday.strftime('%Y-%m-%d') }} to {{
+      sunday.strftime('%Y-%m-%d') }})
+    </h2>
+
+    <!-- Navigation Buttons -->
+    <form method="GET" action="{{ url_for('timesheet_summary') }}">
+      <button type="submit" name="selected_date" value="{{ prev_week_monday }}">
+        Previous Week
+      </button>
+      <button type="submit" name="selected_date" value="{{ next_week_monday }}">
+        Next Week
+      </button>
+      <input type="date" name="selected_date" />
+      <button type="submit">Go</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Date</th>
+          <th>Billable Time</th>
+          <th>Non-billable Admin</th>
+          <th>Non-billable Training</th>
+          <th>Unavailable Time</th>
+          <th>Total Time</th>
+          <th>View Entries</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for summary in week_summary %}
+        <tr>
+          <td>{{ summary.DateofEntry.strftime('%A') }}</td>
+          <td>{{ summary.DateofEntry.strftime('%Y-%m-%d') }}</td>
+          <td>{{ summary.billabletime }}</td>
+          <td>{{ summary.nonbillable_admin }}</td>
+          <td>{{ summary.nonbillable_training }}</td>
+          <td>{{ summary.unavailabletime }}</td>
+          <td>{{ summary.total_time }}</td>
+          <td>
+            <a
+              href="{{ url_for('view_entries', date=summary.DateofEntry.strftime('%Y-%m-%d')) }}"
+              >View Entries</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if not week_summary %}
+    <tr>
+      <td colspan="8">No entries found for this week.</td>
+    </tr>
+    {% endif %}
+  </body>
+</html>

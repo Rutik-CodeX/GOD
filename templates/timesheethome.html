@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Timesheet Home</title>
+  </head>
+  <body>
+    <h2>Timesheet Management</h2>
+    <ul>
+      <li><a href="#">Fill Timesheet</a></li>
+      <li><a href="#">View Summary</a></li>
+      {% if is_manager %}
+      <li><a href="#">Manage Reportee</a></li>
+      {% endif %}
+    </ul>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </body>
+</html>
