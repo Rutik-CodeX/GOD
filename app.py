@@ -4,7 +4,9 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from models import db, Employee , TimesheetEntry
 from flask import session
 from datetime import timedelta , date ,datetime
+from sqlalchemy.exc import SQLAlchemyError
 import uuid
+
 
 
 app = Flask(__name__)
@@ -27,6 +29,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return Employee.query.get(int(user_id))
 
+# ___________________________________________LOGIN-LOGOUT____________________________________________________________
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -40,6 +44,15 @@ def login():
         else:
             flash('Invalid credentials')
     return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# ____________________________________________________________Home_____________________________________________________________________________________
+
 
 @app.route('/home')
 @login_required
@@ -55,6 +68,9 @@ def home():
     }
     return render_template('home.html', user=user_data)
 
+# ______________________________________________________________Timesheet-Home_______________________________________________________________________________________
+
+
 @app.route('/timesheethome')
 @login_required
 def timesheethome():
@@ -62,21 +78,8 @@ def timesheethome():
     is_manager = current_user.Profile == 'Manager'
     return render_template('timesheethome.html', is_manager=is_manager)
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
 
-
-
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
-from datetime import datetime
-from sqlalchemy.exc import SQLAlchemyError
-import uuid
-
-
+# ______________________________________________________________Timesheet-FillForm_______________________________________________________________________________________
 
 # Route to render the form page
 @app.route('/filltimesheet', methods=['GET', 'POST'])
@@ -167,28 +170,25 @@ def submit_timesheet():
         flash(f"Error submitting timesheet: {str(e)}", "error")
         return redirect(url_for('filltimesheet'))
 
+# ______________________________________________________________Timesheet-Summary_______________________________________________________________________________________
 
 
-from datetime import timedelta, datetime
-@app.route('/timesheet/summary', methods=['GET', 'POST'])
+@app.route('/timesheetsummary', methods=['GET', 'POST'])
 @login_required
 def timesheet_summary():
-    # Get the current week (starting Monday) or the selected week
     selected_date_str = request.args.get('selected_date', None)
     if selected_date_str:
         selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d')
     else:
         selected_date = datetime.utcnow()
 
-    # Calculate the Monday of the current or selected week
+
     monday = selected_date - timedelta(days=selected_date.weekday())
-    # Calculate the Sunday of the current or selected week
     sunday = monday + timedelta(days=6)
 
     # Calculate the date range for the current week (Monday to Sunday)
     week_dates = [monday + timedelta(days=i) for i in range(7)]
 
-    # Query the database for timesheet entries for each day of the week
     week_summary = []
     for day in week_dates:
         entries = TimesheetEntry.query.filter_by(EmpID=current_user.EMPID, DateofEntry=day).all()
@@ -224,44 +224,6 @@ def timesheet_summary():
         prev_week_monday=prev_week_monday.strftime('%Y-%m-%d'),
         next_week_monday=next_week_monday.strftime('%Y-%m-%d')
     )
-
-
-
-
-
-
-@app.route('/view_entries/<date>', methods=['GET'])
-@login_required
-def view_entries(date):
-    # Logic to display entries for the given date
-    # You might want to convert `date` from string to a datetime object for further processing
-    date_obj = datetime.strptime(date, '%Y-%m-%d')
-    # Fetch and render the entries based on the date
-    entries = TimesheetEntry.query.filter_by(DateofEntry=date_obj).all()
-    return render_template('view_entries.html', entries=entries, date=date)
-
-
-
-
-@app.route('/routes')
-def list_routes():
-    routes = []
-    for rule in app.url_map.iter_rules():
-        routes.append((rule.endpoint, str(rule)))
-    return '<br>'.join([f"{endpoint}: {url}" for endpoint, url in routes])
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
